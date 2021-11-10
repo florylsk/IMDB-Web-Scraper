@@ -297,9 +297,7 @@ dict_movies = {'Title':titles,'Top Cast':top_cast,'Synopsis':synopsies,'Director
 
 movies = pd.DataFrame(dict_movies)
 print(movies)
-#with open('test_json','w',encoding='utf-8') as f:
- #   f.write(movies.to_json(orient="records",lines=True,force_ascii=False))
 
 with open('test_json.json','w',encoding='utf-8') as f:
-    json=json.dumps(movies.to_dict('records'),ensure_ascii=False).encode('utf8')
+    json=json.dumps(movies.to_dict('records'),ensure_ascii=False,indent=0).encode('utf8') #delete indent for more compressed json
     f.write(json.decode())
