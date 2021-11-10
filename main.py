@@ -21,6 +21,7 @@ ratings=[]
 countries_origin=[]
 plot_keywords=[]
 years=[]
+writers=[]
 
 
 def getTitle(soup):
@@ -187,6 +188,22 @@ def getYear(soup):
     years.append(_years)
 
 
+def getWriter(soup):
+    ___writers=soup.findAll("li",{"data-testid":"title-pc-principal-credit"})
+    try:
+        __writers=___writers[1].get_text()
+    except:
+        writers.append("Not Available")
+    if "Writers" in __writers:
+        _writers=__writers.replace("Writers", '')
+        writer=re.sub('([A-Z])', r' \1', _writers)
+    else:
+        _writers=__writers.replace("Writer", '')
+        writer=_writers
+    writers.append(writer)
+
+
+
 def getData(_url):
     #execute get requests and call the functions to insert the data into the lists
     _response = requests.get(_url)
@@ -206,6 +223,7 @@ def getData(_url):
     getCountriesOrigin(_soup)
     getPlotKeywords(_soup)
     getYear(_soup)
+    getWriter(_soup)
 
 def concurrent_downloads(story_urls):
     #choose the number of threads
@@ -224,10 +242,10 @@ concurrent_downloads(urls_test)
 dict_movies = {'Title':titles,'Top Cast':top_cast,'Synopsis':synopsies,'Director':directors,'Storyline':storylines,
         'Genres':genres,'Release Date':release_dates,'Language':languages,'Production Companies':production_companies,
         'Runtime':runtimes,'Certificate':certificates,'Rating':ratings,'Country of Origin':countries_origin,'Plot Keywords':plot_keywords,
-         'Year':years}
+         'Year':years,'Writers':writers}
 
 movies = pd.DataFrame(dict_movies)
 print(movies)
-with open('test_json','w') as f:
-    f.write(movies.to_json(orient="records",lines=True))
+with open('test_json','w',encoding='utf-8') as f:
+    f.write(movies.to_json(orient="records",lines=True,force_ascii=False))
 
