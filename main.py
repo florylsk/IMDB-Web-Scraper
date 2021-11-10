@@ -286,7 +286,7 @@ def concurrent_downloads(story_urls):
 #read excel for URLs
 df = pd.read_excel('MovieGenreIGC_v3.xlsx')
 urls = df["Imdb Link"]
-urls_test=urls.loc[1:15] #Comment this line to get all the movies from the excel
+urls_test=urls.loc[1:50] #Comment this line to get all the movies from the excel
 #call the function that calls the main function concurrently
 concurrent_downloads(urls_test)
 #create a dataframe and convert it to json to feed elasticsearch
@@ -298,6 +298,6 @@ dict_movies = {'Title':titles,'Top Cast':top_cast,'Synopsis':synopsies,'Director
 movies = pd.DataFrame(dict_movies)
 print(movies)
 
-with open('test_json.json','w',encoding='utf-8') as f:
+with open('movies.json','w',encoding='utf-8') as f:
     json=json.dumps(movies.to_dict('records'),ensure_ascii=False,indent=0).encode('utf8') #delete indent for more compressed json
     f.write(json.decode())
