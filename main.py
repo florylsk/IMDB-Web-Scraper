@@ -18,6 +18,9 @@ production_companies=[]
 runtimes=[]
 certificates=[]
 ratings=[]
+countries_origin=[]
+plot_keywords=[]
+years=[]
 
 
 def getTitle(soup):
@@ -148,6 +151,41 @@ def getRating(soup):
     ratings.append(rating)
 
 
+def getCountriesOrigin(soup):
+    ___countries = soup.find("li", {"data-testid": "title-details-origin"})
+    try:
+        __countries = ___countries.getText()
+    except:
+        production_companies.append("Not Available")
+        return
+    if "Country of origin" in __countries:
+        country = __countries.replace("Country of origin", '')
+    else:
+        country = __countries.replace("Countries of origin", '')
+    countries_origin.append(country)
+
+
+def getPlotKeywords(soup):
+    __keywords = soup.find("div", {"data-testid": "storyline-plot-keywords"})
+    try:
+        _keywords = __keywords.get_text()
+    except:
+        plot_keywords.append("Not Available")
+        return
+    keyword= re.sub('([A-Z])', r' \1', _keywords)
+    plot_keywords.append(keyword)
+
+
+
+def getYear(soup):
+    __years=soup.find("a",{"class":"ipc-link ipc-link--baseAlt ipc-link--inherit-color TitleBlockMetaData__StyledTextLink-sc-12ein40-1 rgaOW"})
+    try:
+        _years=__years.get_text()
+    except:
+        years.append("Not Available")
+        return
+    years.append(_years)
+
 
 def getData(_url):
     #execute get requests and call the functions to insert the data into the lists
@@ -165,6 +203,9 @@ def getData(_url):
     getRuntime(_soup)
     getCertificate(_soup)
     getRating(_soup)
+    getCountriesOrigin(_soup)
+    getPlotKeywords(_soup)
+    getYear(_soup)
 
 def concurrent_downloads(story_urls):
     #choose the number of threads
@@ -182,7 +223,8 @@ concurrent_downloads(urls_test)
 #create a dataframe and convert it to json to feed elasticsearch
 dict_movies = {'Title':titles,'Top Cast':top_cast,'Synopsis':synopsies,'Director':directors,'Storyline':storylines,
         'Genres':genres,'Release Date':release_dates,'Language':languages,'Production Companies':production_companies,
-        'Runtime':runtimes,'Certificate':certificates,'Rating':ratings}
+        'Runtime':runtimes,'Certificate':certificates,'Rating':ratings,'Country of Origin':countries_origin,'Plot Keywords':plot_keywords,
+         'Year':years}
 
 movies = pd.DataFrame(dict_movies)
 print(movies)
