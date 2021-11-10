@@ -5,7 +5,7 @@ import concurrent.futures
 import re
 
 #global variables
-MAX_THREADS=2 #number of threads to execute concurrently
+MAX_THREADS=4 #number of threads to execute concurrently
 titles=[]
 top_cast=[]
 synopsies=[]
@@ -22,6 +22,7 @@ countries_origin=[]
 plot_keywords=[]
 years=[]
 writers=[]
+budgets=[]
 
 
 def getTitle(soup):
@@ -203,6 +204,21 @@ def getWriter(soup):
     writers.append(writer)
 
 
+def getBudget(soup):
+    __budgets=soup.find("li",{"data-testid":"title-boxoffice-budget"})
+    try:
+        _budgets=__budgets.get_text()
+    except:
+        budgets.append("Not Available")
+        return
+    budget=_budgets.replace("Budget","")
+    budgets.append(budget)
+
+
+
+
+
+
 
 def getData(_url):
     #execute get requests and call the functions to insert the data into the lists
@@ -224,6 +240,7 @@ def getData(_url):
     getPlotKeywords(_soup)
     getYear(_soup)
     getWriter(_soup)
+    getBudget(_soup)
 
 def concurrent_downloads(story_urls):
     #choose the number of threads
@@ -235,14 +252,14 @@ def concurrent_downloads(story_urls):
 #read excel for URLs
 df = pd.read_excel('MovieGenreIGC_v3.xlsx')
 urls = df["Imdb Link"]
-urls_test=urls.loc[1:15] #Comment this line to get all the movies from the excel
+urls_test=urls.loc[1:200] #Comment this line to get all the movies from the excel
 #call the function that calls the main function concurrently
 concurrent_downloads(urls_test)
 #create a dataframe and convert it to json to feed elasticsearch
 dict_movies = {'Title':titles,'Top Cast':top_cast,'Synopsis':synopsies,'Director':directors,'Storyline':storylines,
         'Genres':genres,'Release Date':release_dates,'Language':languages,'Production Companies':production_companies,
         'Runtime':runtimes,'Certificate':certificates,'Rating':ratings,'Country of Origin':countries_origin,'Plot Keywords':plot_keywords,
-         'Year':years,'Writers':writers}
+         'Year':years,'Writers':writers,'Budget':budgets}
 
 movies = pd.DataFrame(dict_movies)
 print(movies)
