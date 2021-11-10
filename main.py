@@ -3,9 +3,11 @@ import requests
 import pandas as pd
 import concurrent.futures
 import re
+from tqdm import tqdm
+
 
 #global variables
-MAX_THREADS=4 #number of threads to execute concurrently
+MAX_THREADS=6 #number of threads to execute concurrently
 titles=[]
 top_cast=[]
 synopsies=[]
@@ -24,7 +26,7 @@ years=[]
 writers=[]
 budgets=[]
 grosses=[]
-
+imagelinks=[]
 
 def getTitle(soup):
     _title = soup.find("h1", {"data-testid": "hero-title-block__title"})
@@ -228,6 +230,24 @@ def getGross(soup):
     grosses.append(gross)
 
 
+def getImages(soup):
+    __imagelink=soup.find("a",{"aria-label":"View {Title} Poster"})
+    try:
+        _imagelink=__imagelink['href']
+    except:
+        imagelinks.append("Not Available")
+        return
+    _imagelink_ ="http://imdb.com"+_imagelink
+    response_image=requests.get(_imagelink_)
+    soup_image=BeautifulSoup(response_image.text,'lxml')
+    imagelink=soup_image.find("img",{"class":"MediaViewerImagestyles__PortraitImage-sc-1qk433p-0 bnaOri"})
+    try:
+        imagelink_final=imagelink['src']
+    except:
+        imagelinks.append("Not Available")
+        return
+    imagelinks.append(imagelink_final)
+
 
 
 
@@ -254,25 +274,25 @@ def getData(_url):
     getWriter(_soup)
     getBudget(_soup)
     getGross(_soup)
+    getImages(_soup)
 
 def concurrent_downloads(story_urls):
     #choose the number of threads
     threads = min(MAX_THREADS, len(story_urls))
     #map the threads to the main get data function
     with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
-        executor.map(getData, story_urls)
-
+        list(tqdm(executor.map(getData, story_urls),total=len(story_urls)))
 #read excel for URLs
 df = pd.read_excel('MovieGenreIGC_v3.xlsx')
 urls = df["Imdb Link"]
-urls_test=urls.loc[1:50] #Comment this line to get all the movies from the excel
+urls_test=urls.loc[1:500] #Comment this line to get all the movies from the excel
 #call the function that calls the main function concurrently
 concurrent_downloads(urls_test)
 #create a dataframe and convert it to json to feed elasticsearch
 dict_movies = {'Title':titles,'Top Cast':top_cast,'Synopsis':synopsies,'Director':directors,'Storyline':storylines,
         'Genres':genres,'Release Date':release_dates,'Language':languages,'Production Companies':production_companies,
         'Runtime':runtimes,'Certificate':certificates,'Rating':ratings,'Country of Origin':countries_origin,'Plot Keywords':plot_keywords,
-         'Year':years,'Writers':writers,'Budget':budgets,'Gross Worldwide':grosses}
+         'Year':years,'Writers':writers,'Budget':budgets,'Gross Worldwide':grosses,'Image':imagelinks}
 
 movies = pd.DataFrame(dict_movies)
 print(movies)
