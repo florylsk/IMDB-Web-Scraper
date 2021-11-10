@@ -23,6 +23,7 @@ plot_keywords=[]
 years=[]
 writers=[]
 budgets=[]
+grosses=[]
 
 
 def getTitle(soup):
@@ -212,8 +213,19 @@ def getBudget(soup):
         budgets.append("Not Available")
         return
     budget=_budgets.replace("Budget","")
+    budget = budget.replace(" (estimated)", "")
     budgets.append(budget)
 
+
+def getGross(soup):
+    __grosses = soup.find("li", {"data-testid": "title-boxoffice-cumulativeworldwidegross"})
+    try:
+        _grosses = __grosses.get_text()
+    except:
+        grosses.append("Not Available")
+        return
+    gross = _grosses.replace("Gross worldwide", "")
+    grosses.append(gross)
 
 
 
@@ -241,6 +253,7 @@ def getData(_url):
     getYear(_soup)
     getWriter(_soup)
     getBudget(_soup)
+    getGross(_soup)
 
 def concurrent_downloads(story_urls):
     #choose the number of threads
@@ -252,14 +265,14 @@ def concurrent_downloads(story_urls):
 #read excel for URLs
 df = pd.read_excel('MovieGenreIGC_v3.xlsx')
 urls = df["Imdb Link"]
-urls_test=urls.loc[1:200] #Comment this line to get all the movies from the excel
+urls_test=urls.loc[1:50] #Comment this line to get all the movies from the excel
 #call the function that calls the main function concurrently
 concurrent_downloads(urls_test)
 #create a dataframe and convert it to json to feed elasticsearch
 dict_movies = {'Title':titles,'Top Cast':top_cast,'Synopsis':synopsies,'Director':directors,'Storyline':storylines,
         'Genres':genres,'Release Date':release_dates,'Language':languages,'Production Companies':production_companies,
         'Runtime':runtimes,'Certificate':certificates,'Rating':ratings,'Country of Origin':countries_origin,'Plot Keywords':plot_keywords,
-         'Year':years,'Writers':writers,'Budget':budgets}
+         'Year':years,'Writers':writers,'Budget':budgets,'Gross Worldwide':grosses}
 
 movies = pd.DataFrame(dict_movies)
 print(movies)
