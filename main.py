@@ -17,6 +17,7 @@ languages=[]
 production_companies=[]
 runtimes=[]
 certificates=[]
+ratings=[]
 
 
 def getTitle(soup):
@@ -136,6 +137,17 @@ def getCertificate(soup):
 
 
 
+def getRating(soup):
+    __ratings = soup.find("div", {"data-testid": "hero-rating-bar__aggregate-rating__score"})
+    try:
+        _ratings = __ratings.get_text()
+    except:
+        ratings.append("Not Available")
+        return
+    rating = _ratings.replace("/10", '')
+    ratings.append(rating)
+
+
 
 def getData(_url):
     #execute get requests and call the functions to insert the data into the lists
@@ -152,6 +164,7 @@ def getData(_url):
     getProductionCompanies(_soup)
     getRuntime(_soup)
     getCertificate(_soup)
+    getRating(_soup)
 
 def concurrent_downloads(story_urls):
     #choose the number of threads
@@ -163,13 +176,13 @@ def concurrent_downloads(story_urls):
 #read excel for URLs
 df = pd.read_excel('MovieGenreIGC_v3.xlsx')
 urls = df["Imdb Link"]
-urls_test=urls.loc[1:500]
+urls_test=urls.loc[1:15] #Comment this line to get all the movies from the excel
 #call the function that calls the main function concurrently
 concurrent_downloads(urls_test)
 #create a dataframe and convert it to json to feed elasticsearch
 dict_movies = {'Title':titles,'Top Cast':top_cast,'Synopsis':synopsies,'Director':directors,'Storyline':storylines,
         'Genres':genres,'Release Date':release_dates,'Language':languages,'Production Companies':production_companies,
-        'Runtime':runtimes,'Certificate':certificates}
+        'Runtime':runtimes,'Certificate':certificates,'Rating':ratings}
 
 movies = pd.DataFrame(dict_movies)
 print(movies)
