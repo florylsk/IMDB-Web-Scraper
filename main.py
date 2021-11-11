@@ -105,8 +105,11 @@ def getLanguages(soup):
     except:
         languages.append("Not Available")
         return
-    _languages= re.sub('([A-Z])', r', \1', __languages)
-    language=_languages.replace(", Languages, ",'')
+    _languages = re.sub('([A-Z])', r', \1', __languages)
+    if "Languages" in _languages:
+        language=_languages.replace(", Languages, ",'')
+    else:
+        language = _languages.replace(", Language, ", '')
     languages.append(language)
 
 def getProductionCompanies(soup):
@@ -286,14 +289,14 @@ def concurrent_downloads(story_urls):
 #read excel for URLs
 df = pd.read_excel('MovieGenreIGC_v3.xlsx')
 urls = df["Imdb Link"]
-urls_test=urls.loc[1:50] #Comment this line to get all the movies from the excel
+urls_test=urls.loc[1:200] #Comment this line to get all the movies from the excel
 #call the function that calls the main function concurrently
 concurrent_downloads(urls_test)
 #create a dataframe and convert it to json to feed elasticsearch
-dict_movies = {'Title':titles,'Top Cast':top_cast,'Synopsis':synopsies,'Director':directors,'Storyline':storylines,
-        'Genres':genres,'Release Date':release_dates,'Language':languages,'Production Companies':production_companies,
-        'Runtime':runtimes,'Certificate':certificates,'Rating':ratings,'Country of Origin':countries_origin,'Plot Keywords':plot_keywords,
-         'Year':years,'Writers':writers,'Budget':budgets,'Gross Worldwide':grosses,'Image':imagelinks}
+dict_movies = {'Title':titles,'Year':years,'Genres':genres,'Runtime':runtimes,'Language':languages,
+        'Synopsis':synopsies,'Release Date':release_dates,'Storyline':storylines,'Production Companies':production_companies,
+        'Director':directors,'Writers':writers,'Rating':ratings,'Country of Origin':countries_origin,'Plot Keywords':plot_keywords,
+         'Top Cast':top_cast,'Certificate':certificates,'Budget':budgets,'Gross Worldwide':grosses,'Image':imagelinks}
 
 movies = pd.DataFrame(dict_movies)
 print(movies)
