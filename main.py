@@ -8,7 +8,7 @@ import json
 
 
 #global variables
-MAX_THREADS=6 #number of threads to execute concurrently
+MAX_THREADS=4 #number of threads to execute concurrently
 titles=[]
 top_cast=[]
 synopsies=[]
@@ -204,6 +204,7 @@ def getWriter(soup):
         __writers=___writers[1].get_text()
     except:
         writers.append("Not Available")
+        return
     __writers=__writers.replace('"',"'")
     if "Writers" in __writers:
         _writers=__writers.replace("Writers", '')
@@ -292,9 +293,9 @@ def concurrent_downloads(story_urls):
 #read excel for URLs
 df = pd.read_excel('MovieGenreIGC_v3.xlsx')
 urls = df["Imdb Link"]
-urls_test=urls.loc[1:200] #Comment this line to get all the movies from the excel
+#urls_test=urls.loc[1:200] #Comment this line and type urls instead of urls_test in next function call to get all the movies from the excel
 #call the function that calls the main function concurrently
-concurrent_downloads(urls_test)
+concurrent_downloads(urls)
 #create a dataframe and convert it to json to feed elasticsearch
 dict_movies = {'Title':titles,'Year':years,'Genres':genres,'Runtime':runtimes,'Language':languages,
         'Synopsis':synopsies,'Release Date':release_dates,'Storyline':storylines,'Production Companies':production_companies,
