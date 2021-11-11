@@ -53,6 +53,7 @@ def getSynopsis(soup):
     except:
         synopsies.append("Not available")
         return
+    synopsis = synopsis.replace('"', "'")
     synopsies.append(synopsis)
 
 def getDirector(soup):
@@ -72,6 +73,7 @@ def getStoryline(soup):
     except:
         storylines.append("Not available")
         return
+    storyline = storyline.replace('"', "'")
     storylines.append(storyline)
 
 
@@ -202,6 +204,7 @@ def getWriter(soup):
         __writers=___writers[1].get_text()
     except:
         writers.append("Not Available")
+    __writers=__writers.replace('"',"'")
     if "Writers" in __writers:
         _writers=__writers.replace("Writers", '')
         writer=re.sub('([A-Z])', r' \1', _writers)
