@@ -1,3 +1,4 @@
+import pandas
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
@@ -8,7 +9,7 @@ import json
 
 
 #global variables
-MAX_THREADS=4 #number of threads to execute concurrently
+MAX_THREADS=5 #number of threads to execute concurrently
 titles=[]
 top_cast=[]
 synopsies=[]
@@ -30,7 +31,11 @@ grosses=[]
 imagelinks=[]
 
 def getTitle(soup):
-    _title = soup.find("h1", {"data-testid": "hero-title-block__title"})
+    try:
+        _title = soup.find("h1", {"data-testid": "hero-title-block__title"})
+    except:
+        titles.append("Not Available")
+        return
     try:
         title=_title.getText()
     except:
@@ -39,15 +44,27 @@ def getTitle(soup):
     titles.append(title)
 
 def getCast(soup):
-    _cast=soup.findAll("a",{"data-testid": "title-cast-item__actor"})
+    try:
+        _cast=soup.findAll("a",{"data-testid": "title-cast-item__actor"})
+    except:
+        top_cast.append("Not Available")
+        return
     _casts=[]
     for elem in _cast:
-        _casts.append(elem.getText())
+        try:
+            _casts.append(elem.getText())
+        except:
+            top_cast.append("Not Available")
+            return
     casts=', '.join(_casts)
     top_cast.append(casts)
 
 def getSynopsis(soup):
-    _synopsis= soup.find("span", {"data-testid": "plot-xl"})
+    try:
+        _synopsis= soup.find("span", {"data-testid": "plot-xl"})
+    except:
+        synopsies.append("Not Available")
+        return
     try:
         synopsis=_synopsis.getText()
     except:
@@ -57,7 +74,11 @@ def getSynopsis(soup):
     synopsies.append(synopsis)
 
 def getDirector(soup):
-    _director=soup.find("a",{"class":"ipc-metadata-list-item__list-content-item ipc-metadata-list-item__list-content-item--link"})
+    try:
+        _director=soup.find("a",{"class":"ipc-metadata-list-item__list-content-item ipc-metadata-list-item__list-content-item--link"})
+    except:
+        directors.append("Not Available")
+        return
     try:
         director=_director.getText()
     except:
@@ -67,7 +88,11 @@ def getDirector(soup):
 
 
 def getStoryline(soup):
-    _storyline= soup.find("div", {"data-testid": "storyline-plot-summary"})
+    try:
+        _storyline= soup.find("div", {"data-testid": "storyline-plot-summary"})
+    except:
+        storylines.append("Not Available")
+        return
     try:
         storyline=_storyline.getText()
     except:
@@ -78,7 +103,11 @@ def getStoryline(soup):
 
 
 def getGenre(soup):
-    _genre=soup.find("li", {"data-testid": "storyline-genres"})
+    try:
+        _genre=soup.find("li", {"data-testid": "storyline-genres"})
+    except:
+        genres.append("Not Available")
+        return
     try:
         ___genres=_genre.getText()
     except:
@@ -89,7 +118,11 @@ def getGenre(soup):
     genres.append(_genres)
 
 def getReleaseDates(soup):
-    __releasedate = soup.find("li", {"data-testid": "title-details-releasedate"})
+    try:
+        __releasedate = soup.find("li", {"data-testid": "title-details-releasedate"})
+    except:
+        release_dates.append("Not Available")
+        return
     try:
         _releasedate = __releasedate.getText()
     except:
@@ -101,7 +134,11 @@ def getReleaseDates(soup):
 
 
 def getLanguages(soup):
-    ___languages = soup.find("li", {"data-testid": "title-details-languages"})
+    try:
+        ___languages = soup.find("li", {"data-testid": "title-details-languages"})
+    except:
+        languages.append("Not Available")
+        return
     try:
         __languages = ___languages.getText()
     except:
@@ -115,7 +152,11 @@ def getLanguages(soup):
     languages.append(language)
 
 def getProductionCompanies(soup):
-    ___companies = soup.find("li", {"data-testid": "title-details-companies"})
+    try:
+        ___companies = soup.find("li", {"data-testid": "title-details-companies"})
+    except:
+        production_companies.append("Not Available")
+        return
     try:
         __companies = ___companies.getText()
     except:
@@ -129,7 +170,11 @@ def getProductionCompanies(soup):
 
 
 def getRuntime(soup):
-    ___runtimes = soup.find("li", {"data-testid": "title-techspec_runtime"})
+    try:
+        ___runtimes = soup.find("li", {"data-testid": "title-techspec_runtime"})
+    except:
+        runtimes.append("Not Available")
+        return
     try:
         __runtimes = ___runtimes.getText()
     except:
@@ -140,7 +185,11 @@ def getRuntime(soup):
 
 
 def getCertificate(soup):
-    ___certificates = soup.find("li", {"data-testid": "storyline-certificate"})
+    try:
+        ___certificates = soup.find("li", {"data-testid": "storyline-certificate"})
+    except:
+        certificates.append("Not Available")
+        return
     try:
          __certificates = ___certificates.get_text()
     except:
@@ -152,7 +201,11 @@ def getCertificate(soup):
 
 
 def getRating(soup):
-    __ratings = soup.find("div", {"data-testid": "hero-rating-bar__aggregate-rating__score"})
+    try:
+        __ratings = soup.find("div", {"data-testid": "hero-rating-bar__aggregate-rating__score"})
+    except:
+        ratings.append("Not Available")
+        return
     try:
         _ratings = __ratings.get_text()
     except:
@@ -163,7 +216,11 @@ def getRating(soup):
 
 
 def getCountriesOrigin(soup):
-    ___countries = soup.find("li", {"data-testid": "title-details-origin"})
+    try:
+        ___countries = soup.find("li", {"data-testid": "title-details-origin"})
+    except:
+        countries_origin.append("Not Available")
+        return
     try:
         __countries = ___countries.getText()
     except:
@@ -177,7 +234,11 @@ def getCountriesOrigin(soup):
 
 
 def getPlotKeywords(soup):
-    __keywords = soup.find("div", {"data-testid": "storyline-plot-keywords"})
+    try:
+        __keywords = soup.find("div", {"data-testid": "storyline-plot-keywords"})
+    except:
+        plot_keywords.append("Not Available")
+        return
     try:
         _keywords = __keywords.get_text()
     except:
@@ -189,7 +250,11 @@ def getPlotKeywords(soup):
 
 
 def getYear(soup):
-    __years=soup.find("a",{"class":"ipc-link ipc-link--baseAlt ipc-link--inherit-color TitleBlockMetaData__StyledTextLink-sc-12ein40-1 rgaOW"})
+    try:
+        __years=soup.find("a",{"class":"ipc-link ipc-link--baseAlt ipc-link--inherit-color TitleBlockMetaData__StyledTextLink-sc-12ein40-1 rgaOW"})
+    except:
+        years.append("Not Available")
+        return
     try:
         _years=__years.get_text()
     except:
@@ -199,7 +264,11 @@ def getYear(soup):
 
 
 def getWriter(soup):
-    ___writers=soup.findAll("li",{"data-testid":"title-pc-principal-credit"})
+    try:
+        ___writers=soup.findAll("li",{"data-testid":"title-pc-principal-credit"})
+    except:
+        writers.append("Not Available")
+        return
     try:
         __writers=___writers[1].get_text()
     except:
@@ -216,7 +285,11 @@ def getWriter(soup):
 
 
 def getBudget(soup):
-    __budgets=soup.find("li",{"data-testid":"title-boxoffice-budget"})
+    try:
+        __budgets=soup.find("li",{"data-testid":"title-boxoffice-budget"})
+    except:
+        budgets.append("Not Available")
+        return
     try:
         _budgets=__budgets.get_text()
     except:
@@ -228,7 +301,11 @@ def getBudget(soup):
 
 
 def getGross(soup):
-    __grosses = soup.find("li", {"data-testid": "title-boxoffice-cumulativeworldwidegross"})
+    try:
+        __grosses = soup.find("li", {"data-testid": "title-boxoffice-cumulativeworldwidegross"})
+    except:
+        grosses.append("Not Available")
+        return
     try:
         _grosses = __grosses.get_text()
     except:
@@ -239,7 +316,11 @@ def getGross(soup):
 
 
 def getImages(soup):
-    __imagelink=soup.find("a",{"aria-label":"View {Title} Poster"})
+    try:
+        __imagelink=soup.find("a",{"aria-label":"View {Title} Poster"})
+    except:
+        imagelinks.append("Not Available")
+        return
     try:
         _imagelink=__imagelink['href']
     except:
@@ -263,6 +344,8 @@ def getImages(soup):
 def getData(_url):
     #execute get requests and call the functions to insert the data into the lists
     _response = requests.get(_url)
+    if (_response.status_code==404):
+        return
     _soup = BeautifulSoup(_response.text, 'lxml')
     getTitle(_soup)
     getCast(_soup)
@@ -293,9 +376,17 @@ def concurrent_downloads(story_urls):
 #read excel for URLs
 df = pd.read_excel('MovieGenreIGC_v3.xlsx')
 urls = df["Imdb Link"]
-#urls_test=urls.loc[1:200] #Comment this line and type urls instead of urls_test in next function call to get all the movies from the excel
+urls_final=[]
+for e in urls:
+    if (len(e)==35):
+        urls_final.append(e)
+    else:
+     test=e.replace('tt0','tt')
+     urls_final.append(test)
+
+urls_test=urls_final[17501:25000] #Comment this line and type urls instead of urls_test in next function call to get all the movies from the excel
 #call the function that calls the main function concurrently
-concurrent_downloads(urls)
+concurrent_downloads(urls_test)
 #create a dataframe and convert it to json to feed elasticsearch
 dict_movies = {'Title':titles,'Year':years,'Genres':genres,'Runtime':runtimes,'Language':languages,
         'Synopsis':synopsies,'Release Date':release_dates,'Storyline':storylines,'Production Companies':production_companies,
@@ -303,8 +394,9 @@ dict_movies = {'Title':titles,'Year':years,'Genres':genres,'Runtime':runtimes,'L
          'Top Cast':top_cast,'Certificate':certificates,'Budget':budgets,'Gross Worldwide':grosses,'Image':imagelinks}
 
 movies = pd.DataFrame(dict_movies)
+final_df=pd.DataFrame(dict([ (k,pd.Series(v)) for k,v in movies.items() ]))
 print(movies)
 
-with open('movies.json','w',encoding='utf-8') as f:
-    json=json.dumps(movies.to_dict('records'),ensure_ascii=False,indent=0).encode('utf8') #delete indent for more compressed json
+with open('movies_p6.json','w',encoding='utf-8') as f:
+    json=json.dumps(final_df.to_dict(orient='records'),ensure_ascii=False,indent=0).encode('utf8') #delete indent for more compressed json
     f.write(json.decode())
