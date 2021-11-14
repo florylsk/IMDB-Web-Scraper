@@ -384,7 +384,7 @@ for e in urls:
      test=e.replace('tt0','tt')
      urls_final.append(test)
 
-urls_test=urls_final[17501:25000] #Comment this line and type urls instead of urls_test in next function call to get all the movies from the excel
+urls_test=urls_final[20000:25000] #Comment this line and type urls instead of urls_test in next function call to get all the movies from the excel
 #call the function that calls the main function concurrently
 concurrent_downloads(urls_test)
 #create a dataframe and convert it to json to feed elasticsearch
@@ -393,10 +393,10 @@ dict_movies = {'Title':titles,'Year':years,'Genres':genres,'Runtime':runtimes,'L
         'Director':directors,'Writers':writers,'Rating':ratings,'Country of Origin':countries_origin,'Plot Keywords':plot_keywords,
          'Top Cast':top_cast,'Certificate':certificates,'Budget':budgets,'Gross Worldwide':grosses,'Image':imagelinks}
 
-movies = pd.DataFrame(dict_movies)
-final_df=pd.DataFrame(dict([ (k,pd.Series(v)) for k,v in movies.items() ]))
-print(movies)
+#movies = pd.DataFrame(dict_movies)
+final_df=pd.DataFrame(dict([ (k,pd.Series(v)) for k,v in dict_movies.items() ]))
+#print(movies)
 
-with open('movies_p6.json','w',encoding='utf-8') as f:
+with open('movies_p7.json','w',encoding='utf-8') as f:
     json=json.dumps(final_df.to_dict(orient='records'),ensure_ascii=False,indent=0).encode('utf8') #delete indent for more compressed json
     f.write(json.decode())
