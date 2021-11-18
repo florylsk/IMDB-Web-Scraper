@@ -12,7 +12,7 @@ MAX_THREADS=32
 es = Elasticsearch()
 
 #open the json for reading
-with open("movies_final.json", 'r', encoding='utf-8') as f:
+with open("movies_final_cleaned.json", 'r', encoding='utf-8') as f:
     data=json.loads(f.read())
 
 #function to insert the data in the elastic search index
@@ -28,4 +28,5 @@ def concurrent_insert(total_data):
         executor.map(insert_data, total_data)
 
 #calls the concurrent insert function
+
 concurrent_insert(data)

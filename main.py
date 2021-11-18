@@ -397,6 +397,6 @@ dict_movies = {'Title':titles,'Year':years,'Genres':genres,'Runtime':runtimes,'L
 final_df=pd.DataFrame(dict([ (k,pd.Series(v)) for k,v in dict_movies.items() ]))
 #print(movies)
 
-with open('movies_p8.json','w',encoding='utf-8') as f:
+with open('movies_p9.json','w',encoding='utf-8') as f:
     json=json.dumps(final_df.to_dict(orient='records'),ensure_ascii=False,indent=0).encode('utf8') #delete indent for more compressed json
     f.write(json.decode())
