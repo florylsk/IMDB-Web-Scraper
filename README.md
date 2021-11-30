@@ -36,5 +36,11 @@ GET movies\_search
         }
 
     }
+    
+    
+    
+    
+    
+    https://stackoverflow.com/questions/45758646/pandas-convert-string-into-list-of-strings
 
 }
